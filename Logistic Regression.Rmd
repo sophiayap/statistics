@@ -1,0 +1,105 @@
+---
+title: 'Logistic Regression: Pima Indians Diabetes Dataset'
+author: "Sophia Yap"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Regression
+
+Regression is a broad statistical idea used to examine relationships between an outcome variable and one or more predictor variables.
+
+Some common types of regression include:
+
+- **Simple linear regression**
+- **Multiple linear regression**
+- **Logistic regression**
+
+Logistic regression is used when the outcome variable has **two possible categories**, such as yes/no, success/failure, or diabetes/no diabetes.
+
+# Pima Indians Diabetes Dataset
+
+In this example, we use the Pima Indians Diabetes dataset. The outcome variable indicates whether a person has diabetes.
+
+We will use **glucose** and **age** as predictor variables.
+
+## Import the Data
+
+First, we load the dataset from GitHub.
+
+```{r}
+url <- "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv"
+
+PimaIndiansDiabetes <- read.csv(url, header = FALSE)
+
+head(PimaIndiansDiabetes)
+```
+
+## Rename the Variables
+
+The original dataset does not contain column names, so we assign meaningful names to the variables.
+
+```{r}
+names(PimaIndiansDiabetes) <- c(
+  "pregnant",
+  "glucose",
+  "pressure",
+  "triceps",
+  "insulin",
+  "mass",
+  "pedigree",
+  "age",
+  "diabetes"
+)
+
+head(PimaIndiansDiabetes)
+```
+
+## Examine the Structure of the Data
+
+We can use `str()` to examine the structure and data types of the variables.
+
+```{r}
+str(PimaIndiansDiabetes)
+```
+
+# Logistic Regression Model
+
+We fit a logistic regression model using `glm()`.
+
+The outcome variable is **diabetes**, and the predictor variables are **glucose** and **age**.
+
+```{r}
+model <- glm(
+  diabetes ~ glucose + age,
+  data = PimaIndiansDiabetes,
+  family = binomial()
+)
+
+summary(model)
+```
+
+# Interpretation
+
+### Outcome
+
+The outcome variable is **diabetes**, which indicates whether the person has diabetes.
+
+### Predictors
+
+The predictors in the model are:
+
+- **Glucose**
+- **Age**
+
+### Results
+
+The logistic regression results can be interpreted in terms of the **odds of diabetes**.
+
+A positive coefficient for **glucose** indicates that higher glucose levels are associated with higher odds of diabetes, while holding age constant.
+
+A positive coefficient for **age** indicates that increasing age is associated with higher odds of diabetes, after accounting for glucose.
+
+Therefore, in this model, **glucose and age have positive associations with the odds of diabetes**.
