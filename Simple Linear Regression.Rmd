@@ -1,0 +1,49 @@
+---
+title: "Simple Linear Regression"
+author: "Sophia Yap"
+date: "2026-10-03"
+output: pdf_document
+---
+
+# Regression
+
+Regression is the broad idea, and simple linear regression, multiple linear
+regression, and logistic regression are different types/models.
+
+Simple linear regression only has one predictor.
+
+## Data and plot
+
+```{r}
+library(ggplot2)
+
+head(women)
+
+women |>
+  ggplot(aes(height, weight)) +
+  geom_point(size = 3, alpha = .5) +
+  geom_smooth(method = lm, se = FALSE) +
+  theme_bw() +
+  labs(
+    title = "Weight explained by Height in Women",
+    x = "Height",
+    y = "Weight"
+  )
+```
+
+## Linear model
+
+A linear model asks: How much of the change in weight can be explained by
+change in height?
+
+```{r}
+model1 <- lm(weight ~ height, data = women)
+
+summary(model1)
+```
+
+The slope is approximately 3.45. This means that for every one-unit increase
+in height, the predicted weight increases by approximately 3.45 units.
+
+The R-squared is approximately 0.991, meaning that about 99.1% of the
+variation in weight is explained by height in this linear model.
