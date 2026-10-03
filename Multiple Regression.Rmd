@@ -1,0 +1,116 @@
+---
+title: "Multiple Regression"
+author: "Sophia Yap"
+date: "2026-10-03"
+output: pdf_document
+---
+
+# Regression
+
+Regression is the broad idea, and simple linear regression, multiple linear regression, and logistic regression are different types of regression models.
+
+- **Simple linear regression** has one predictor and one outcome.
+- **Multiple linear regression** has several predictors and one outcome.
+- **Logistic regression** is used when the outcome is categorical, usually binary.
+
+In multiple regression, we use several predictors to explain or predict one outcome.
+
+# Example 1: Trees
+
+We will use the built-in `trees` dataset.
+
+## Data Visualisation
+
+```{r}
+library(ggplot2)
+
+data(trees)
+
+trees |>
+  ggplot(aes(Girth, Volume, color = Height)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_bw() +
+  labs(
+    title = "Tree Volume Explained by Girth and Height",
+    x = "Girth",
+    y = "Volume",
+    color = "Height"
+  )
+```
+
+## Model
+
+We can use multiple linear regression to model tree volume using girth and height as predictors.
+
+```{r}
+model <- lm(Volume ~ Girth + Height, data = trees)
+
+summary(model)
+```
+
+## Interpretation
+
+Girth and height are associated with an increase in tree volume.
+
+The regression coefficients show the expected change in tree volume associated with each predictor while holding the other predictor constant.
+
+# Example 2: Penguins
+
+We will use the `penguins` dataset from the `palmerpenguins` package.
+
+## Data Visualisation
+
+```{r}
+library(palmerpenguins)
+
+penguins |>
+  ggplot(aes(bill_depth_mm, bill_length_mm)) +
+  geom_point(aes(color = species), alpha = 0.7) +
+  geom_smooth(
+    aes(color = species),
+    method = "lm",
+    se = FALSE
+  ) +
+  theme_bw() +
+  labs(
+    title = "Penguin Bill Length Explained by Bill Depth",
+    x = "Bill Depth",
+    y = "Bill Length"
+  )
+```
+
+## Model
+
+We can use multiple linear regression to model bill length using bill depth and species as predictors.
+
+```{r}
+model2 <- lm(
+  bill_length_mm ~ bill_depth_mm + species,
+  data = penguins
+)
+
+summary(model2)
+```
+
+## Interpretation
+
+Approximately **79% of the variation in bill length** can be explained by bill depth and species, based on the R-squared value.
+
+Using **Adelie** as the reference species:
+
+* Changing from Adelie to Chinstrap is associated with an estimated increase of **9.939 mm** in bill length, holding bill depth constant.
+* Changing from Adelie to Gentoo is associated with an estimated increase of **13.4 mm** in bill length, holding bill depth constant.
+
+# Summary
+
+Multiple linear regression allows us to examine the relationship between an outcome variable and several predictors.
+
+In these examples:
+
+* **Trees:** Volume is the outcome, while Girth and Height are the predictors.
+* **Penguins:** Bill Length is the outcome, while Bill Depth and Species are the predictors.
+
+```
+```
+
