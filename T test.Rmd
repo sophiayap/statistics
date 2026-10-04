@@ -1,0 +1,72 @@
+
+---
+title: 'Life Expectancy: Africa vs Europe'
+output: pdf_document
+---
+
+## 1. Load the packages
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(patchwork)
+library(gapminder)
+library(ggplot2)
+```
+
+## 2. Explore the Gapminder dataset
+
+First, we look at the `gapminder` dataset.
+
+```{r view-data}
+View(gapminder)
+```
+
+We can also look at how many continents are included in the dataset.
+
+There are five continents: **Asia, Europe, Africa, Americas, and Oceania**.
+
+```{r continents}
+unique(gapminder$continent)
+```
+
+## 3. Compare Life Expectancy between Africa and Europe
+
+Next, we draw a density plot to compare life expectancy between Africa and Europe.
+
+```{r density-plot}
+ggplot(
+  subset(gapminder, continent %in% c("Africa", "Europe")),
+  aes(x = lifeExp, fill = continent, color = continent)
+) +
+  geom_density(alpha = 0.25, linewidth = 1.2) +
+  labs(
+    title = "Life Expectancy: Africa vs Europe",
+    x = "Life Expectancy (years)",
+    y = "Density",
+    fill = "Continent",
+    color = "Continent"
+  ) +
+  theme_minimal()
+```
+
+## 4. T-test
+
+Finally, we use a two-sided t-test to compare life expectancy between Africa and Europe.
+
+```{r t-test}
+Ttest <- gapminder %>%
+  filter(continent %in% c("Africa", "Europe")) %>%
+  t.test(
+    lifeExp ~ continent,
+    data = .,
+    alternative = "two.sided"
+  )
+
+Ttest
+```
+
+The null hypothesis is that the mean life expectancy is the same in Africa and Europe.
+
+The alternative hypothesis is that the mean life expectancy is different between the two continents.
+
+The p-value is less than 0.05, so we reject the null hypothesis. This indicates that there is a statistically significant difference in life expectancy between Africa and Europe.
