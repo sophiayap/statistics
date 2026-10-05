@@ -1,0 +1,125 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+---
+---------------------
+
+# Palmer Penguins
+
+## Load the data
+
+```{r setup, message=FALSE, warning=FALSE}
+library(dplyr)
+library(palmerpenguins)
+library(ggplot2)
+
+# Load the penguins dataset
+penguins
+```
+
+## Exploring the data
+
+First, we can look at how many penguins there are from each species.
+
+```{r}
+dplyr::count(penguins, species)
+```
+
+There are three species of penguins: Adelie, Chinstrap, and Gentoo.
+
+We can also look at the number of penguins on each island.
+
+```{r}
+dplyr::count(penguins, island)
+```
+
+There are three islands: Biscoe, Dream, and Torgersen.
+
+We can examine the distribution of species across the islands.
+
+```{r}
+penguins |> count(island, species)
+```
+
+The different penguin species are found on different islands.
+
+We can also look at the number of penguins by sex.
+
+```{r}
+dplyr::count(penguins, sex)
+```
+
+There are 165 female penguins and 168 male penguins. Some observations have missing values for sex.
+
+## Plot
+
+We can examine the relationship between flipper length and bill length, while using color to distinguish between sexes.
+
+The original `palmerpenguins` dataset uses the variable names `flipper_length_mm` and `bill_length_mm`. For convenience, these are renamed below.
+
+```{r}
+penguins <- penguins |>
+  rename(
+    flipper_len = flipper_length_mm,
+    bill_len = bill_length_mm,
+    body_mass = body_mass_g
+  )
+```
+
+We can now create a scatter plot.
+
+```{r}
+penguins |>
+  ggplot(aes(flipper_len, bill_len, color = sex)) +
+  geom_point()
+```
+
+Because there are some missing values for sex, we remove these observations before creating a more detailed plot. We also use `facet_wrap()` to create a separate plot for each species.
+
+```{r}
+penguins |>
+  filter(!is.na(sex)) |>
+  ggplot(aes(flipper_len, bill_len, color = sex, size = body_mass)) +
+  geom_point() +
+  facet_wrap(~species)
+```
+
+For all three species of penguins, female penguins generally have smaller flippers and shorter bills than male penguins.
+
+## Logistic Regression
+
+We can use logistic regression to investigate whether bill length, flipper length, and body mass can predict penguin sex.
+
+First, we remove observations with missing values in any of the variables used in the model.
+
+```{r}
+penguins_clean <- na.omit(penguins[, c(
+  "sex", "bill_len", "flipper_len", "body_mass"
+)])
+```
+
+We then fit a logistic regression model using `sex` as the response variable.
+
+```{r}
+model <- glm(
+  sex ~ bill_len + flipper_len + body_mass,
+  data = penguins_clean,
+  family = binomial
+)
+
+summary(model)
+```
+
+### Interpretation
+
+The logistic regression results show that bill length and body mass were positively associated with the odds of being male, whereas flipper length was negatively associated with the odds of being male. All three predictors were statistically significant ($p < .001$).
+
+The positive coefficient for bill length means that, holding the other variables constant, larger bill length is associated with higher odds of being male.
+
+The negative coefficient for flipper length means that, holding the other variables constant, larger flipper length is associated with lower odds of being male.
+
+The positive coefficient for body mass means that, holding the other variables constant, greater body mass is associated with higher odds of being male.
+
+Overall, the results suggest that bill length, flipper length, and body mass are significant predictors of penguin sex.
