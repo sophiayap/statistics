@@ -1,0 +1,68 @@
+---
+title: "Exploring the Star Wars Dataset"
+author: "Sophia Yap"
+output: pdf_document
+---
+
+# Exploring the Star Wars Dataset
+
+## Introduction
+
+In this analysis, we explore the Star Wars dataset using the `tidyverse` package. We investigate the relationship between character height and mass and highlight human characters in the scatter plot.
+
+## Load the Required Package
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+## Prepare the Data
+
+First, we select human characters and remove rows with missing values in `height`, `mass`, or `sex`.
+
+```{r prepare-data}
+just_humans <- starwars |>
+  filter(species == "Human") |>
+  drop_na(height, mass, sex)
+```
+
+We also remove rows with missing values from the full dataset before creating the plot.
+
+## Visualize Height and Mass
+
+The scatter plot shows the relationship between height and mass. Human characters are highlighted with larger blue circles.
+
+```{r scatter-plot, fig.width=8, fig.height=6}
+starwars |>
+  drop_na(height, mass, sex) |>
+  ggplot(aes(x = height, y = mass, color = sex)) +
+  geom_point() +
+  scale_y_continuous(limits = c(0, 200)) +
+  geom_point(
+    data = just_humans,
+    aes(x = height, y = mass),
+    shape = 1,
+    color = "steelblue",
+    size = 4,
+    stroke = 1.5
+  ) +
+  labs(
+    title = "Height vs. Mass in Star Wars Characters",
+    x = "Height (cm)",
+    y = "Mass (kg)",
+    color = "Sex"
+  )
+```
+
+## Explanation
+
+- **`drop_na(height, mass, sex)`** removes rows with missing values in these three columns.
+- **`just_humans`** contains human characters without missing values in the selected columns.
+- **`scale_y_continuous(limits = c(0, 200))`** limits the visible mass range to 0–200 kg.
+- **`geom_point()`** creates the scatter plot.
+- The second **`geom_point()`** highlights human characters using larger, blue-outlined circles.
+- **`labs()`** adds the plot title, axis labels, and legend title.
+
+## Conclusion
+
+The scatter plot allows us to explore how height and mass vary among Star Wars characters. The highlighted points make it easier to identify human characters and compare them with other species.
