@@ -1,0 +1,103 @@
+---
+title: "Exploring Mammal Sleep Patterns"
+author: "Sophia Yap"
+output: pdf_document
+---
+
+# Introduction
+
+This project explores the `msleep` dataset, which contains information about the sleep habits of different mammals. The analysis focuses on sleep duration across different dietary categories and animal orders.
+
+## 1. Load Packages and Explore the Dataset
+
+The following packages are used to manipulate the data and create visualizations.
+
+```{r setup, message=FALSE, warning=FALSE}
+# Install forcats if it is not already installed
+# install.packages("forcats")
+
+# Load packages
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(forcats)
+```
+
+The `msleep` dataset is included with `ggplot2`. We can view the dataset and read its documentation to understand the variables.
+
+
+## 2. Sleep Duration by Dietary Category
+
+Mammals can be classified into different dietary categories, including:
+
+- **Carnivores:** Animals that primarily eat meat.
+- **Herbivores:** Animals that primarily eat plants.
+- **Insectivores:** Animals that primarily eat insects.
+- **Omnivores:** Animals that eat both plants and animals.
+
+The following boxplot compares total sleep duration across dietary categories. Rows with missing values for `vore` are removed before plotting.
+
+```{r sleep-by-diet, fig.width=8, fig.height=5}
+msleep |>
+  drop_na(vore) |>
+  ggplot(aes(x = vore, y = sleep_total)) +
+  geom_boxplot() +
+  coord_flip() +
+  theme_bw() +
+  labs(
+    title = "Total Sleep Duration by Dietary Category",
+    x = "Dietary Category",
+    y = "Total Sleep (hours per day)"
+  )
+```
+
+### Interpretation
+
+The boxplot allows us to compare the distribution of sleep duration across dietary categories. It shows the median, spread, and potential outliers for each group. These patterns help us explore whether sleep duration differs among mammals with different diets.
+
+## 3. Average Sleep Duration by Animal Order
+
+Next, we examine average sleep duration across animal orders.
+
+The data are grouped by `order`, and the mean total sleep duration is calculated for each group. The `fct_reorder()` function arranges the animal orders according to their average sleep duration.
+
+```{r sleep-by-order, fig.width=10, fig.height=7}
+msleep |>
+  group_by(order) |>
+  summarise(
+    mean_sleep = mean(sleep_total, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  mutate(
+    order = fct_reorder(order, mean_sleep)
+  ) |>
+  ggplot(aes(x = order, y = mean_sleep)) +
+  geom_point(size = 3, color = "orange") +
+  geom_hline(
+    yintercept = mean(msleep$sleep_total, na.rm = TRUE),
+    color = "grey",
+    linewidth = 1
+  ) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1)
+  ) +
+  labs(
+    title = "Average Sleep Duration by Animal Order",
+    subtitle = "The horizontal line represents the overall mean sleep duration",
+    x = "Animal Order",
+    y = "Mean Total Sleep (hours per day)"
+  )
+```
+
+### Interpretation
+
+This dot plot compares the average daily sleep duration of mammals across different animal orders. Each orange point represents the mean sleep duration for an order.
+
+The horizontal grey line represents the overall mean sleep duration across the dataset. Orders above the line have a higher average sleep duration than the overall mean, while orders below the line have a lower average.
+
+## 4. Conclusion
+
+This analysis uses data visualization to explore differences in mammal sleep patterns.
+
+The boxplot compares sleep duration across dietary categories, while the dot plot compares average sleep duration across animal orders. Together, these visualizations help identify patterns and differences in sleep behavior among mammals.
