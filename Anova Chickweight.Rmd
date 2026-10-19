@@ -1,0 +1,129 @@
+---
+title: 'Analysis of Variance (ANOVA): Chick Weight and Feed Type'
+author: "Sophia Yap"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  theme: readable
+---
+
+# 1. Introduction
+
+In this analysis, we investigate whether the type of feed given to chicks is associated with their weight.
+
+We use the built-in `chickwts` dataset in R, which contains the weights of chicks fed different types of feed.
+
+**Research question:** Does the type of feed affect the weight of chicks?
+
+## Hypotheses
+
+- **Null hypothesis (\(H_0\)):** The mean chick weight is the same for all feed types.
+- **Alternative hypothesis (\(H_1\)):** At least one feed type has a different mean chick weight.
+
+We use a one-way analysis of variance (ANOVA) to test these hypotheses.
+
+# 2. Exploring the Data
+
+First, we inspect the dataset and load the `tidyverse` package for data visualisation.
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+# View the dataset
+View(chickwts)
+
+# Display the first few observations
+head(chickwts)
+
+# Summarise the dataset
+summary(chickwts)
+```
+
+The dataset contains two main variables:
+
+- `weight`: The weight of each chick.
+- `feed`: The type of feed given to each chick.
+
+# 3. Data Visualisation
+
+We use a boxplot with jittered points to compare chick weights across the different feed types.
+
+```{r visualisation, fig.width=9, fig.height=6}
+ggplot(chickwts, aes(x = feed, y = weight)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.15, alpha = 0.7) +
+  labs(
+    title = "Chick Weight by Feed Type",
+    x = "Feed Type",
+    y = "Chick Weight (grams)"
+  ) +
+  theme_minimal()
+```
+
+The boxplot allows us to compare the distributions, medians, and variability of chick weights across feed types. The jittered points show individual observations.
+
+The plot suggests that chick weights differ across feed types. However, visual inspection alone is not sufficient to determine whether these differences are statistically significant. We therefore perform an ANOVA.
+
+# 4. Analysis of Variance (ANOVA)
+
+## 4.1 Fitting the Model
+
+We fit a one-way ANOVA model to investigate whether mean chick weight differs according to feed type.
+
+```{r anova-model}
+model <- aov(weight ~ feed, data = chickwts)
+
+# Display the ANOVA results
+summary(model)
+```
+
+## 4.2 Interpreting the Results
+
+The ANOVA tests whether all feed types have the same population mean chick weight.
+
+The main result to examine is the **p-value** in the ANOVA table.
+
+- If the p-value is less than 0.05, we reject the null hypothesis.
+- If the p-value is greater than or equal to 0.05, we fail to reject the null hypothesis.
+
+A very small p-value provides strong evidence against the null hypothesis, suggesting that mean chick weight differs for at least one feed type.
+
+**Conclusion:** If the ANOVA p-value is below 0.05, we conclude that there is a statistically significant association between feed type and mean chick weight. This does not necessarily mean that every feed type differs from every other feed type.
+
+# 5. Post-hoc Analysis: Tukey's HSD Test
+
+## 5.1 Why Do We Need a Post-hoc Test?
+
+ANOVA tells us whether there is evidence of a difference among the group means, but it does not identify which specific feed types differ.
+
+To investigate this, we use Tukey's Honestly Significant Difference (HSD) test. This compares all pairs of feed types while adjusting for multiple comparisons.
+
+```{r tukey-test}
+tukey_results <- TukeyHSD(model)
+
+# Display pairwise comparisons
+tukey_results
+```
+
+## 5.2 Interpreting the Results
+
+For each pairwise comparison, examine the `p adj` column, which contains the adjusted p-value.
+
+- **Adjusted p-value below 0.05:** There is evidence of a statistically significant difference between the two feed types.
+- **Adjusted p-value of 0.05 or greater:** There is insufficient evidence of a statistically significant difference between the two feed types.
+
+The `diff` column reports the estimated difference between the group means. The `lwr` and `upr` columns give the lower and upper bounds of the confidence interval.
+
+For example, if the comparison between horsebean and casein has an adjusted p-value below 0.05, we conclude that the mean chick weights for these two feed types differ significantly.
+
+We should examine the full Tukey output before concluding which pairs are significantly different.
+
+# 6. Overall Conclusion
+
+The one-way ANOVA investigates whether mean chick weight differs across feed types. If the ANOVA result is statistically significant, we reject the null hypothesis that all feed types have equal mean chick weights.
+
+Tukey's HSD test then identifies which pairs of feed types show statistically significant differences.
+
+Overall, this analysis helps us understand whether feed type is associated with chick weight and which feed types are associated with different average weights.
+
+**Statistical note:** ANOVA assesses differences in mean weight, not statistical independence in the strict sense. The analysis also assumes independent observations, approximately normal model residuals within groups, and reasonably similar variances across feed types.
